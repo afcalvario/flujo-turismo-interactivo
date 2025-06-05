@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flujo Circular de la Economía en el Turismo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos personalizados adicionales */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .actor {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        .actor:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .actor.selected {
+            border-color: #2563eb; /* Tailwind blue-600 */
+            background-color: #eff6ff; /* Tailwind blue-50 */
+        }
+        .info-panel-placeholder {
+            min-height: 200px; /* Asegura altura mínima para el panel de info */
+        }
+        .arrow {
+            font-size: 1.2em;
+            margin: 0 0.2em;
+        }
+        /* Animación sutil para el panel de información */
+        #infoPanelContent {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Estructura visual del diagrama (simplificado) */
+        .diagram-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: auto auto;
+            gap: 1rem; /* Espacio entre elementos */
+            align-items: center;
+            justify-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            position: relative; /* Para líneas de flujo si se añaden con JS/CSS avanzado */
+        }
+
+        /* Posicionamiento de los actores */
+        #actor-familias { grid-column: 2 / 3; grid-row: 1 / 2; }
+        #actor-empresas { grid-column: 3 / 4; grid-row: 2 / 3; }
+        #actor-gobierno { grid-column: 1 / 2; grid-row: 2 / 3; }
+        #actor-financiero { grid-column: 2 / 3; grid-row: 3 / 4; }
+        #actor-exterior { grid-column: 3 / 4; grid-row: 3 / 4; }
+
+        /* Ajustes para pantallas pequeñas */
+        @media (max-width: 768px) {
+            .diagram-container {
+                grid-template-columns: 1fr 1fr; /* Dos columnas en móvil */
+                grid-template-rows: auto auto auto;
+            }
+            #actor-familias { grid-column: 1 / 2; grid-row: 1 / 2; }
+            #actor-empresas { grid-column: 2 / 3; grid-row: 1 / 2; }
+            #actor-gobierno { grid-column: 1 / 2; grid-row: 2 / 2; }
+            #actor-financiero { grid-column: 2 / 3; grid-row: 2 / 2; }
+            #actor-exterior { grid-column: 1 / 3; grid-row: 3 / 4; } /* Ocupa todo el ancho */
+
+            .actor {
+                padding: 0.5rem;
+                font-size: 0.875rem;
+            }
+            h1 {
+                font-size: 1.5rem; /* Ajusta el tamaño del título principal */
+            }
+            #infoPanel h2 {
+                font-size: 1.125rem; /* Ajusta el tamaño del título en el panel de info */
+            }
+        }
+         /* Estilos para las flechas (ejemplo básico) */
+        .flow-arrow {
+            position: absolute;
+            color: #6b7280; /* Tailwind gray-500 */
+            font-size: 2rem; /* Tamaño de la flecha */
+            z-index: -1; /* Detrás de los actores */
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-sky-700">Flujo Circular de la Economía Aplicado al Turismo</h1>
+            <p class="text-slate-600 mt-2">Haz clic en cada actor para conocer su papel e interacciones.</p>
+        </header>
+
+        <!-- Diagrama de Actores -->
+        <div class="diagram-container bg-white p-6 rounded-xl shadow-lg mb-8">
+            <!-- Fila 1 -->
+            <div id="actor-familias" class="actor bg-sky-500 text-white p-3 md:p-4 rounded-lg shadow-md text-center w-full md:w-auto">
+                <span class="font-semibold">Familias</span><br>(Turistas y Empleados)
+            </div>
+
+            <!-- Fila 2 -->
+             <div id="actor-gobierno" class="actor bg-emerald-500 text-white p-3 md:p-4 rounded-lg shadow-md text-center w-full md:w-auto">
+                <span class="font-semibold">Gobierno</span>
+            </div>
+            <div class="w-full h-full flex items-center justify-center text-slate-400 text-sm md:text-base">
+                <!-- Espacio central, podría tener un ícono o texto pequeño -->
+                Intercambios Económicos
+            </div>
+            <div id="actor-empresas" class="actor bg-amber-500 text-white p-3 md:p-4 rounded-lg shadow-md text-center w-full md:w-auto">
+                <span class="font-semibold">Empresas Turísticas</span>
+            </div>
+
+
+            <!-- Fila 3 -->
+            <div id="actor-financiero" class="actor bg-indigo-500 text-white p-3 md:p-4 rounded-lg shadow-md text-center w-full md:w-auto">
+                <span class="font-semibold">Sector Financiero</span>
+            </div>
+             <div id="actor-exterior" class="actor bg-rose-500 text-white p-3 md:p-4 rounded-lg shadow-md text-center w-full md:w-auto">
+                <span class="font-semibold">Sector Exterior</span>
+            </div>
+        </div>
+
+        <!-- Panel de Información Dinámico -->
+        <div id="infoPanel" class="bg-white p-6 rounded-xl shadow-lg info-panel-placeholder">
+            <div id="infoPanelContent">
+                <h2 class="text-xl md:text-2xl font-semibold text-sky-700 mb-3">Bienvenido</h2>
+                <p class="text-slate-600">Selecciona un actor del diagrama para ver su descripción detallada, sus principales ingresos (flujos de entrada) y sus principales gastos o contribuciones (flujos de salida) en el contexto turístico.</p>
+            </div>
+        </div>
+
+        <footer class="text-center mt-12 py-4 border-t border-slate-200">
+            <p class="text-sm text-slate-500">Diagrama interactivo del Flujo Circular de la Economía Turística.</p>
+        </footer>
+    </div>
+
+    <script>
+        const descriptions = {
+            familias: {
+                title: "Familias (Hogares, Turistas y Empleados)",
+                text: "Este grupo incluye tanto a los turistas que viajan y consumen bienes y servicios turísticos, como a los residentes locales que trabajan en el sector turístico y reciben ingresos (salarios, propinas). Las familias son la fuente de la demanda turística y de la mano de obra.",
+                inflows: [
+                    { text: "Salarios, sueldos y propinas", from: "Empresas Turísticas", arrow: "⬅" },
+                    { text: "Rentas y dividendos por inversiones", from: "Empresas Turísticas / Sector Financiero", arrow: "⬅" },
+                    { text: "Servicios públicos y transferencias", from: "Gobierno", arrow: "⬅" },
+                    { text: "Préstamos y créditos", from: "Sector Financiero", arrow: "⬅" }
+                ],
+                outflows: [
+                    { text: "Gasto en bienes y servicios turísticos (alojamiento, comida, tours)", to: "Empresas Turísticas", arrow: "➔" },
+                    { text: "Pago de impuestos (IVA, IRPF)", to: "Gobierno", arrow: "➔" },
+                    { text: "Ahorro e inversiones", to: "Sector Financiero", arrow: "➔" },
+                    { text: "Gasto en turismo emisivo (viajes al extranjero)", to: "Sector Exterior", arrow: "➔" }
+                ]
+            },
+            empresas: {
+                title: "Empresas Turísticas",
+                text: "Incluye hoteles, restaurantes, aerolíneas, agencias de viajes, atracciones, y otros proveedores de servicios turísticos. Producen y ofrecen los servicios que demandan los turistas, generan empleo e invierten en el sector.",
+                inflows: [
+                    { text: "Ingresos por venta de bienes y servicios turísticos", from: "Familias (turistas) / Sector Exterior (turistas internacionales)", arrow: "⬅" },
+                    { text: "Inversiones y préstamos", from: "Sector Financiero", arrow: "⬅" },
+                    { text: "Subsidios y ayudas públicas", from: "Gobierno", arrow: "⬅" },
+                    { text: "Inversión extranjera directa", from: "Sector Exterior", arrow: "⬅" }
+                ],
+                outflows: [
+                    { text: "Pago de salarios, sueldos y beneficios", to: "Familias (empleados)", arrow: "➔" },
+                    { text: "Compra de insumos y materias primas", to: "Otras Empresas / Sector Exterior (importaciones)", arrow: "➔" },
+                    { text: "Pago de impuestos ( sociedades, tasas turísticas)", to: "Gobierno", arrow: "➔" },
+                    { text: "Pago de intereses y dividendos", to: "Sector Financiero / Familias (inversores)", arrow: "➔" },
+                    { text: "Repatriación de beneficios (empresas extranjeras)", to: "Sector Exterior", arrow: "➔" }
+                ]
+            },
+            gobierno: {
+                title: "Gobierno",
+                text: "Entidades públicas a nivel nacional, regional y local. Recauda impuestos, regula la actividad turística, invierte en infraestructura (aeropuertos, carreteras, promoción del destino), y provee servicios públicos.",
+                inflows: [
+                    { text: "Impuestos de las familias (IVA, IRPF)", from: "Familias", arrow: "⬅" },
+                    { text: "Impuestos de las empresas turísticas (sociedades, tasas)", from: "Empresas Turísticas", arrow: "⬅" },
+                    { text: "Ingresos por concesiones y licencias turísticas", from: "Empresas Turísticas", arrow: "⬅" }
+                ],
+                outflows: [
+                    { text: "Gasto público en infraestructura turística y promoción", to: "Empresas / Mercado", arrow: "➔" },
+                    { text: "Provisión de servicios públicos (seguridad, sanidad)", to: "Familias / Empresas", arrow: "➔" },
+                    { text: "Salarios de empleados públicos del sector turístico", to: "Familias", arrow: "➔" },
+                    { text: "Subsidios y ayudas al sector turístico", to: "Empresas Turísticas", arrow: "➔" }
+                ]
+            },
+            financiero: {
+                title: "Sector Financiero",
+                text: "Bancos, fondos de inversión y otras instituciones financieras. Canalizan el ahorro de las familias y empresas hacia la inversión, facilitan transacciones y ofrecen créditos para el consumo y la inversión en turismo.",
+                inflows: [
+                    { text: "Ahorros de las familias", from: "Familias", arrow: "⬅" },
+                    { text: "Depósitos y excedentes de las empresas turísticas", from: "Empresas Turísticas", arrow: "⬅" }
+                ],
+                outflows: [
+                    { text: "Préstamos e inversiones para familias (consumo turístico)", to: "Familias", arrow: "➔" },
+                    { text: "Financiación e inversión para empresas turísticas (proyectos, expansión)", to: "Empresas Turísticas", arrow: "➔" },
+                    { text: "Inversiones en el sector público relacionado con turismo", to: "Gobierno", arrow: "➔"}
+                ]
+            },
+            exterior: {
+                title: "Sector Exterior",
+                text: "Representa las interacciones económicas del destino turístico con el resto del mundo. Incluye turistas internacionales, inversión extranjera, empresas turísticas multinacionales, e importación/exportación de bienes y servicios.",
+                inflows: [
+                    { text: "Gasto de turistas internacionales (exportación de servicios)", from: "Turistas extranjeros", arrow: "⬅" },
+                    { text: "Inversión extranjera directa en el sector turístico local", from: "Inversores extranjeros", arrow: "⬅" }
+                ],
+                outflows: [
+                    { text: "Gasto de turistas nacionales en el extranjero (importación de servicios)", to: "Destinos extranjeros", arrow: "➔" },
+                    { text: "Importación de bienes y servicios para la industria turística", to: "Proveedores extranjeros", arrow: "➔" },
+                    { text: "Repatriación de beneficios de empresas turísticas extranjeras", to: "Países de origen", arrow: "➔" }
+                ]
+            }
+        };
+
+        const actors = document.querySelectorAll('.actor');
+        const infoPanelContent = document.getElementById('infoPanelContent');
+        let currentSelectedActor = null;
+
+        actors.forEach(actor => {
+            actor.addEventListener('click', () => {
+                const actorId = actor.id.split('-')[1]; // e.g., "actor-familias" -> "familias"
+                const data = descriptions[actorId];
+
+                if (currentSelectedActor) {
+                    currentSelectedActor.classList.remove('selected', 'text-sky-700', 'bg-sky-100');
+                     // Revert to original classes based on actorId or a default
+                    if (currentSelectedActor.id.includes('familias')) currentSelectedActor.classList.add('bg-sky-500', 'text-white');
+                    else if (currentSelectedActor.id.includes('empresas')) currentSelectedActor.classList.add('bg-amber-500', 'text-white');
+                    else if (currentSelectedActor.id.includes('gobierno')) currentSelectedActor.classList.add('bg-emerald-500', 'text-white');
+                    else if (currentSelectedActor.id.includes('financiero')) currentSelectedActor.classList.add('bg-indigo-500', 'text-white');
+                    else if (currentSelectedActor.id.includes('exterior')) currentSelectedActor.classList.add('bg-rose-500', 'text-white');
+                }
+
+                actor.classList.add('selected');
+                // Specific selected styles - remove generic ones if they conflict
+                actor.classList.remove('bg-sky-500', 'bg-amber-500', 'bg-emerald-500', 'bg-indigo-500', 'bg-rose-500', 'text-white');
+                actor.classList.add('text-sky-700', 'bg-sky-100');
+
+
+                currentSelectedActor = actor;
+
+                let inflowsHtml = data.inflows.map(flow =>
+                    `<li class="flex items-center mb-1">
+                        <span class="arrow text-green-500 font-bold">${flow.arrow}</span>
+                        <span class="ml-2">${flow.text} <em class="text-xs text-slate-500">(de ${flow.from})</em></span>
+                    </li>`
+                ).join('');
+
+                let outflowsHtml = data.outflows.map(flow =>
+                    `<li class="flex items-center mb-1">
+                        <span class="arrow text-red-500 font-bold">${flow.arrow}</span>
+                        <span class="ml-2">${flow.text} <em class="text-xs text-slate-500">(a ${flow.to})</em></span>
+                    </li>`
+                ).join('');
+
+                infoPanelContent.innerHTML = `
+                    <h2 class="text-xl md:text-2xl font-semibold text-sky-700 mb-3">${data.title}</h2>
+                    <p class="text-slate-600 mb-4">${data.text}</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <h3 class="text-lg font-semibold text-green-600 mb-2">Flujos de Entrada (Ingresos)</h3>
+                            <ul class="list-none pl-0 text-sm text-slate-700">${inflowsHtml}</ul>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-red-600 mb-2">Flujos de Salida (Gastos/Contribuciones)</h3>
+                            <ul class="list-none pl-0 text-sm text-slate-700">${outflowsHtml}</ul>
+                        </div>
+                    </div>
+                `;
+            });
+        });
+    </script>
+</body>
+</html>
